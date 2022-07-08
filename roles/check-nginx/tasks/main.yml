@@ -1,0 +1,34 @@
+---
+# tasks file for check-nginx
+
+- name: Initialize Facts
+  set_fact:
+    directives_check:
+      server_tokens_off:
+        regexp: '\s*server_tokens\s*off\s*;'
+        exists: false
+      proxy_hide_header_x_powered_by:
+        regexp: '\s*proxy_hide_header\s*X-Powered-By\s*;'
+        exists: false
+      add_header_x_frame_origin_sameorigin:
+        regexp: '\s*add_header\s*X-Frame-Options\s*SAMEORIGIN\s*;'
+        exists: false
+
+# changed -> if item.regexp exists, ok -> if not exists
+- name: Check if Required Directives Exists in nginx.conf
+  ansible.builtin.lineinfile:
+    path: /etc/nginx/nginx.conf
+    regexp: "{{ directives_check[item].regexp }}"
+    state: absent
+  check_mode: true
+  register: lineinfile_directives_check
+  loop: "{{ directives_check | list }}"
+
+- name: Set Directive Checks
+  set_fact:
+    directives_check: "{{ directives_check | combine({item.0: {'exists': true}}, recursive=true) }}"
+  when: item.1.changed == true
+  loop: "{{ directives_check | list | zip(lineinfile_directives_check.results) | list }}"
+
+- debug:
+    msg: "{{ directives_check }}"
