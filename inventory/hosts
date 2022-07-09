@@ -1,4 +1,13 @@
 [all]
-vm_ubuntu20 ansible_host=192.168.33.10 ansible_ssh_user=vagrant ansible_ssh_private_key_file=.vagrant/machines/vm_ubuntu20/virtualbox/private_key
-vm_ubuntu18 ansible_host=192.168.33.11 ansible_ssh_user=vagrant ansible_ssh_private_key_file=.vagrant/machines/vm_ubuntu18/virtualbox/private_key
-vm_centos8 ansible_host=192.168.33.12 ansible_ssh_user=vagrant ansible_ssh_private_key_file=.vagrant/machines/centos8/virtualbox/private_key
+vm_ubuntu20 ansible_host=192.168.33.10 ansible_ssh_user=vagrant
+vm_ubuntu18 ansible_host=192.168.33.11 ansible_ssh_user=vagrant
+vm_centos8 ansible_host=192.168.33.12 ansible_ssh_user=vagrant
+vm_ubuntu20_jenkins ansible_host=192.168.33.13 ansible_ssh_user=vagrant
+
+[webservers]
+vm_ubuntu20
+vm_ubuntu18
+vm_centos8
+
+[jenkins]
+vm_ubuntu20_jenkins

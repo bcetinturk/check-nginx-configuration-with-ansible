@@ -1,0 +1,26 @@
+---
+# tasks file for install-jenkins
+- name: Install openjdk-11
+  ansible.builtin.apt:
+    name: openjdk-11-jre
+    update_cache: true
+
+- name: Download Jenkins GPG Key
+  ansible.builtin.get_url:
+    url: https://pkg.jenkins.io/debian-stable/jenkins.io.key
+    dest: /tmp/jenkinskey
+
+- name: De-Armor Jenkins GPG Key
+  ansible.builtin.shell:  "sudo gpg --dearmor < /tmp/jenkinskey | sudo tee /usr/share/keyrings/jenkins-archive-keyring.gpg"
+  changed_when: false
+
+- name: Add Jenkins Repository to APT Sources List
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/jenkins-archive-keyring.gpg] https://pkg.jenkins.io/debian-stable binary/"
+    state: present
+
+- name: Install Jenkins
+  ansible.builtin.apt:
+    name: jenkins
+    update_cache: yes
+
