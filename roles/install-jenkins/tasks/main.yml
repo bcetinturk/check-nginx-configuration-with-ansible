@@ -21,6 +21,10 @@
 
 - name: Install Jenkins
   ansible.builtin.apt:
-    name: jenkins
+    name: "{{ item }}"
     update_cache: yes
+  loop: 
+    - jenkins
+    - python3-pip
+    - ansible
 

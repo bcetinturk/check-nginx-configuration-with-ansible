@@ -50,6 +50,13 @@ Vagrant.configure("2") do |config|
         echo #{ssh_public_key} >> /home/vagrant/.ssh/authorized_keys
       SHELL
     end
+
+    vm_config.vm.provision "ansible" do |ansible|
+      ansible.inventory_path = "inventory/hosts"
+      ansible.playbook = "jenkins-install.yml"
+      ansible.ask_become_pass = true
+    end
+
   end
 
 end
