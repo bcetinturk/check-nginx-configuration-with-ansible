@@ -36,12 +36,12 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  config.vm.define "vm_ubuntu18_jenkins" do |vm_config|
+  config.vm.define "vm_ubuntu20_jenkins" do |vm_config|
     vm_config.vm.box = "ubuntu/focal64"
     vm_config.vm.network "private_network", ip: "192.168.33.13"
     
     vm_config.vm.provider "virtualbox" do |vb, override|
-      vb.name = "vm_ubuntu18_jenkins"
+      vb.name = "vm_ubuntu20_jenkins"
     end
 
     vm_config.vm.provision "shell" do |shell|
