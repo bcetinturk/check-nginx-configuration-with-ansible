@@ -27,4 +27,84 @@
     - jenkins
     - python3-pip
     - ansible
+  ignore_errors: true
 
+- name: Remove default JAVA_ARGS
+  ansible.builtin.lineinfile:
+    path: /lib/systemd/system/jenkins.service
+    regexp: '^Environment="JAVA_OPTS=-Djava.awt.headless=true"$'
+    line: '# Environment="JAVA_OPTS=-Djava.awt.headless=true"'
+
+- name: Modify JAVA_ARGS to skip setup wizard
+  ansible.builtin.lineinfile:
+    path: /lib/systemd/system/jenkins.service
+    insertafter: '^# Environment="JAVA_OPTS=-Djava.awt.headless=true"$'
+    line: "Environment=\"JAVA_OPTS=-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false\""
+
+- name: Daemon-reload
+  ansible.builtin.systemd:
+    daemon-reload: true
+
+- name: Restart Jenkins
+  ansible.builtin.service:
+    name: jenkins
+    state: restarted
+
+- name: Get initial password
+  ansible.builtin.slurp:
+    src: /var/lib/jenkins/secrets/initialAdminPassword
+  register: admin_password
+
+- name: Debug admin_password
+  debug:
+    msg: "{{ admin_password['content'] | b64decode | trim }}"
+
+- name: Install Jenkins plugins
+  community.general.jenkins_plugin:
+    name: "{{ item }}"
+    url_username: admin
+    url_password: "{{ admin_password['content'] | b64decode | trim }}"
+    url: http://192.168.33.13:8080
+  register: plugin_result
+  loop:
+    - configuration-as-code
+    - workflow-job
+    - workflow-durable-task-step
+    - workflow-multibranch
+    - pipeline-input-step
+    - pipeline-model-definition
+    - pipeline-stage-step
+    - workflow-basic-steps
+    - workflow-aggregator
+
+- debug:
+    msg: "{{ plugin_result }}"
+
+- name: Restart Jenkins
+  ansible.builtin.service:
+    name: jenkins
+    state: restarted
+  when: plugin_result.changed == true
+
+# - name: Create .ssh directory for Jenkins user
+#   ansible.builtin.file:
+#     path: /var/lib/jenkins/.ssh
+#     state: directory
+#     owner: jenkins
+#     group: jenkins
+#     mode: '0700'
+
+# - name: Copy private key to Jenkins user's ssh directory
+#   ansible.builtin.copy:
+#     src: "{{ item.src }}"
+#     dest: "{{ item.dest }}"
+#     owner: jenkins
+#     group: jenkins
+#     mode: '0400'
+#   loop:
+#     - src: ~/.ssh/id_rsa
+#       dest: /var/lib/jenkins/.ssh/id_rsa
+#     - src: ~/vault-pass-file.txt
+#       dest: /var/lib/jenkins/vault-pass-file.txt
+#     - src: jenkins.yaml
+#       dest: /var/lib/jenkins/jenkins.yaml

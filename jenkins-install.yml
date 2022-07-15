@@ -1,4 +1,5 @@
 - hosts: jenkins
+  gather_facts: false
   become: true
   roles:
     - install-jenkins
