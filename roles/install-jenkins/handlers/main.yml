@@ -1,2 +1,12 @@
 ---
 # handlers file for install-jenkins
+- name: Daemon-reload
+  ansible.builtin.systemd:
+    daemon-reload: true
+  listen: "restart jenkins"
+
+- name: Restart Jenkins
+  ansible.builtin.service:
+    name: jenkins
+    state: restarted
+  listen: "restart jenkins"
