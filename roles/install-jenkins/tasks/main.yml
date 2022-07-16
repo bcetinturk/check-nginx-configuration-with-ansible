@@ -88,13 +88,13 @@
     - ansible
   notify: "restart jenkins"
 
-# - name: Create .ssh directory for Jenkins user
-#   ansible.builtin.file:
-#     path: /var/lib/jenkins/.ssh
-#     state: directory
-#     owner: jenkins
-#     group: jenkins
-#     mode: '0700'
+- name: Create .ssh directory for Jenkins user
+  ansible.builtin.file:
+    path: /var/lib/jenkins/.ssh
+    state: directory
+    owner: jenkins
+    group: jenkins
+    mode: '0700'
 
 - name: Copy private key to Jenkins user's ssh directory
   ansible.builtin.copy:
@@ -104,10 +104,10 @@
     group: jenkins
     mode: '0400'
   loop:
-    # - src: ~/.ssh/id_rsa
-    #   dest: /var/lib/jenkins/.ssh/id_rsa
-    # - src: ~/vault-pass-file.txt
-    #   dest: /var/lib/jenkins/vault-pass-file.txt
+    - src: ~/.ssh/id_rsa
+      dest: /var/lib/jenkins/.ssh/id_rsa
+    - src: ~/vault-pass-file.txt
+      dest: /var/lib/jenkins/vault-pass-file.txt
     - src: jenkins.yml
       dest: /var/lib/jenkins/jenkins.yml
   notify: "restart jenkins"

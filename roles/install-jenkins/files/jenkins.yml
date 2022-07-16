@@ -1,6 +1,23 @@
 jenkins:
   systemMessage: "Jenkins is configured through 'Jenkins Configuration as Code' plugin"
 
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+        - basicSSHUserPrivateKey:
+            scope: GLOBAL
+            id: vagrant-ssh-key
+            username: vagrant
+            privateKeySource:
+              directEntry:
+                privateKey: "${readFile:/var/lib/jenkins/.ssh/id_rsa}"
+        - file:
+            scope: GLOBAL
+            id: vault-password-file
+            fileName: /var/lib/jenkins/vault-pass-file.txt
+            secretBytes: "${readFileBase64:/var/lib/jenkins/vault-pass-file.txt}"
+
 jobs:
   - script: >
       pipelineJob('check-nginx-configuration') {
