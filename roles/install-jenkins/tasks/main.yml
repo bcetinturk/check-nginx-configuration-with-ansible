@@ -12,7 +12,8 @@
 
 - name: De-Armor Jenkins GPG Key
   ansible.builtin.shell:  "sudo gpg --dearmor < /tmp/jenkinskey | sudo tee /usr/share/keyrings/jenkins-archive-keyring.gpg"
-  changed_when: false
+  args:
+    creates: /usr/share/keyrings/jenkins-archive-keyring.gpg
 
 - name: Add Jenkins Repository to APT Sources List
   ansible.builtin.apt_repository:
@@ -27,6 +28,7 @@
     - jenkins
     - python3-pip
     - ansible
+  # sometimes 'systemctl start jenkins' times out, causing this task to fail
   ignore_errors: true
 
 - name: Remove default JAVA_ARGS
