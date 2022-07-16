@@ -11,30 +11,30 @@ ssh_public_key_file = "#{Dir.home}/.ssh/id_rsa.pub"
 
 Vagrant.configure("2") do |config|
 
-  # machines.each do |machine|
-  #   config.vm.define machine["name"] do |vm_config|
-  #     vm_config.vm.box = machine["box"]
-  #     vm_config.vm.network "private_network", ip: machine["private_ip"]
+  machines.each do |machine|
+    config.vm.define machine["name"] do |vm_config|
+      vm_config.vm.box = machine["box"]
+      vm_config.vm.network "private_network", ip: machine["private_ip"]
 
-  #     vm_config.vm.provision "shell" do |shell|
-  #       ssh_public_key = File.readlines(ssh_public_key_file).first.strip
-  #       shell.inline = <<-SHELL
-  #         echo #{ssh_public_key} >> /home/vagrant/.ssh/authorized_keys
-  #       SHELL
-  #     end
+      vm_config.vm.provision "shell" do |shell|
+        ssh_public_key = File.readlines(ssh_public_key_file).first.strip
+        shell.inline = <<-SHELL
+          echo #{ssh_public_key} >> /home/vagrant/.ssh/authorized_keys
+        SHELL
+      end
 
-  #     vm_config.vm.provision "ansible" do |ansible|
-  #       ansible.inventory_path = "inventory/hosts"
-  #       ansible.playbook = "nginx-install.yml"
-  #       ansible.ask_become_pass = true
-  #     end
+      vm_config.vm.provision "ansible" do |ansible|
+        ansible.inventory_path = "inventory/hosts"
+        ansible.playbook = "nginx-install.yml"
+        ansible.ask_vault_pass = true
+      end
 
-  #     vm_config.vm.provider "virtualbox" do |vb, override|
-  #       vb.name = machine["name"]
-  #     end
+      vm_config.vm.provider "virtualbox" do |vb, override|
+        vb.name = machine["name"]
+      end
 
-  #   end
-  # end
+    end
+  end
 
   config.vm.define "vm_ubuntu20_jenkins" do |vm_config|
     vm_config.vm.box = "ubuntu/focal64"

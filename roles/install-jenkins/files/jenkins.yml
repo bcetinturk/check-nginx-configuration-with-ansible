@@ -1,2 +1,23 @@
 jenkins:
   systemMessage: "Jenkins is configured through 'Jenkins Configuration as Code' plugin"
+
+jobs:
+  - script: >
+      pipelineJob('check-nginx-configuration') {
+        logRotator {
+          numToKeep(5)
+        }
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('https://github.com/bcetinturk/check-nginx-configuration-with-ansible.git')
+                }
+                branch('*/main')
+              }
+            }
+            lightweight()
+          }
+        }
+      }

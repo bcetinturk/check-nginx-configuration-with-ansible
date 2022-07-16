@@ -41,15 +41,19 @@
     insertafter: '^# Environment="JAVA_OPTS=-Djava.awt.headless=true"$'
     line: "Environment=\"JAVA_OPTS=-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false\""
   notify: "restart jenkins"
+  register: java_args_update
 
-- name: Daemon-reload
-  ansible.builtin.systemd:
-    daemon-reload: true
+- name: Restart Jenkins Block
+  block:
+    - name: Daemon-reload
+      ansible.builtin.systemd:
+        daemon-reload: true
 
-- name: Restart Jenkins
-  ansible.builtin.service:
-    name: jenkins
-    state: restarted
+    - name: Restart Jenkins
+      ansible.builtin.service:
+        name: jenkins
+        state: restarted
+  when: java_args_update.changed == true
 
 - name: Get initial password
   ansible.builtin.slurp:
@@ -77,6 +81,9 @@
     - pipeline-stage-step
     - workflow-basic-steps
     - workflow-aggregator
+    - git
+    - job-dsl
+    - ansible
   notify: "restart jenkins"
 
 # - name: Create .ssh directory for Jenkins user
